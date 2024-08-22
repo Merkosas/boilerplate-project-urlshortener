@@ -22,10 +22,25 @@ app.get('/', function(req, res) {
 const urlDatabase = {};
 let urlCount = 1;
 
+// Function to validate URL format
+function isValidUrl(string) {
+  try {
+    new URL(string);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 // POST endpoint to create short URL
 app.post('/api/shorturl', function(req, res) {
   const originalUrl = req.body.url;
-  const parsedUrl = urlparser.parse(originalUrl);
+  
+  if (!isValidUrl(originalUrl)) {
+    return res.json({ error: 'invalid url' });
+  }
+
+  const parsedUrl = new URL(originalUrl);
   
   dns.lookup(parsedUrl.hostname, (err) => {
     if (err) {
